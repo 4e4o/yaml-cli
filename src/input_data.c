@@ -1,6 +1,9 @@
 #include "input_data.h"
 
 #include <string.h>
+#include <stdlib.h>
+
+#define DEFAULT_INPUT_FILE "/etc/majestic.yaml"
 
 static prog_args_t g_args;
 
@@ -76,13 +79,13 @@ static int parse_args(int argc, char *argv[]) {
     /* Display the help string. */
 
     if (g_args.help) {
-        printf("%s YAML files values getter/setter\n\nOptions:\n"
+        printf("%s v%s YAML files values getter/setter\n\nOptions:\n"
                "-h, --help\t\tdisplay this help and exit\n"
                "-i, --input <file>\tuse input file\n"
                "-o, --output <file>\tuse output file\n"
                "-c, --canonical\t\toutput in the canonical YAML format\n"
                "-u, --unicode\t\toutput unescaped non-ASCII characters\n",
-               argv[0]);
+               argv[0], PROJECT_VERSION);
         return 0;
     }
 
@@ -91,10 +94,8 @@ static int parse_args(int argc, char *argv[]) {
         return 0;
     }
 
-    if (g_args.in_file.path == NULL) {
-        fprintf(stderr, "No input file, use -i <file_path>\n");
-        return 0;
-    }
+    if (g_args.in_file.path == NULL)
+        g_args.in_file.path = DEFAULT_INPUT_FILE;
 
     return 1;
 }
@@ -104,7 +105,7 @@ static FILE *open_file(const char *file_type, const char *path,
     FILE *file = NULL;
     file = fopen(path, modes);
 
-    if (path == NULL)
+    if (file == NULL)
         fprintf(stderr, "Failed to open %s file %s\n", file_type, path);
 
     return file;
